@@ -1,95 +1,103 @@
+"use client";
+
 import Image from "next/image";
-import styles from "./page.module.css";
+import { useState, useEffect, useRef } from "react";
+import "./styles.css";
+import { create } from "domain";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+    const [xMatrix, setxMatrix] = useState(5);
+    const [yMatrix, setyMatrix] = useState(5);
+    const [matrix, setMatrix] = useState<number[][]>([]); // Initialize a 5x5 matrix with zeros
+    const [bufferMatrix, setBufferMatrix] = useState<number[][]>([]); // Initialize a 5x5 matrix with zeros
+    const x = 5; // replace with your desired number of rows
+    const y = 5; // replace with your desired number of columns
+    const xnumber = useRef<HTMLInputElement>(null);
+    const ynumber = useRef<HTMLInputElement>(null);
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+    function createMatrix(x: number, y: number) {
+        const matrix: number[][] = [];
+        for (let i = 0; i < x; i++) {
+            matrix[i] = new Array(y).fill(0); // Initialize each row with zeros
+        }
+        setMatrix(matrix);
+    }
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+    function handleResize() {
+        setWindowWidth(window.innerWidth);
+        setWindowHeight(window.innerHeight);
+    }
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+    function handleXYChange() {
+        // check if value is divisible by 2
+        if (xnumber.current && ynumber.current) {
+            if (parseInt(xnumber.current.value) % 2 !== 0 || parseInt(ynumber.current.value) % 2 !== 0) {
+                toast.error("Please enter a number divisible by 2");
+                return;
+            }
+        }
+        toast.success("Matrix Changed");
+        const xValue = xnumber.current ? parseInt(xnumber.current.value) : 1;
+        const yValue = ynumber.current ? parseInt(ynumber.current.value) : 1;
+        setxMatrix(xValue > 1 ? xValue : 1);
+        setyMatrix(yValue > 1 ? yValue : 1);
+        createMatrix(xValue, yValue);
+    }
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
+    useEffect(() => {
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    useEffect(() => {
+        console.log(`xMatrix: ${xMatrix}, yMatrix: ${yMatrix}`);
+        console.log(`Matrix : ${matrix}`);
+    }, [xMatrix, yMatrix, matrix]);
+
+    return (
+        <>
+            <ToastContainer />
+            <div
+                style={{
+                    display: "flex",
+                    position: "absolute",
+                    justifySelf: "center",
+                    flexDirection: "row",
+                    padding: "1em",
+                    height: "5em",
+                    alignItems: "center",
+                    borderRadius: "0.5em",
+                    border: "1px solid red",
+                    zIndex: 100,
+                }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{ display: "flex", flexDirection: "row" }}>
+                        <div style={{ padding: "0.25em" }}>length</div>
+                        <input type='number' ref={xnumber}></input>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "row" }}>
+                        <div style={{ padding: "0.25em" }}>height</div>
+                        <input type='number' ref={ynumber}></input>
+                    </div>
+                </div>
+                <button style={{ height: "100%", margin: "1em", padding: "0.5em" }} onClick={handleXYChange}>
+                    Generate Next
+                </button>
+                <button style={{ height: "100%", padding: "0.5em" }}>Stop Generating</button>
+            </div>
+            <div
+                className='grid-container'
+                style={{ gridTemplateColumns: `repeat(${xMatrix}, 1fr)`, gridTemplateRows: `repeat(${yMatrix}, 1fr)` }}>
+                {Array.from({ length: xMatrix * yMatrix }).map((_, index) => (
+                    <div key={index} className='grid-item' onClick={()=>console.log(index+1)}>
+                        Item {index + 1}
+                    </div>
+                ))}
+            </div>
+        </>
+    );
 }

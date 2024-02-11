@@ -1,0 +1,10 @@
+.grid-container {
+    display: grid;
+    gap: 1px; /* adjust to your desired gap between grid items */
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  .grid-item {
+    border: 1px solid black; /* Optional, just to visualize the grid items */
+  }
