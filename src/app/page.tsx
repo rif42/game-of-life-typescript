@@ -8,8 +8,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
-    const [xMatrix, setxMatrix] = useState(5);
-    const [yMatrix, setyMatrix] = useState(5);
+    const [xMatrix, setxMatrix] = useState<number>(5);
+    const [yMatrix, setyMatrix] = useState<number>(5);
     const [matrix, setMatrix] = useState<number[]>([]); // Initialize a 5x5 matrix with zeros
     const [bufferMatrix, setBufferMatrix] = useState<number[]>([]); // Initialize a 5x5 matrix with zeros
     const x = 5; // replace with your desired number of rows
@@ -47,17 +47,26 @@ export default function Home() {
         // console.log(checkValidIndexes(matrix_index));
     }
 
-    function generateNext(matrix_index: number) {
-        const valid_matrix: number[] = checkValidIndexes(matrix_index);
+    function generateNext() {
         const buffer_matrix: number[] = [];
         const edge_matrix: number[] = [];
         matrix.forEach((val, index) => {
-            if (index === matrix_index) {
-                console.log("Left", isLeftEdgeMatrix(index));
-                console.log("Right", isRightEdgeMatrix(index));
-                console.log("Top", isTopEdgeMatrix(index));
-                console.log("Bottom", isBottomEdgeMatrix(index));
-            }
+            const valid_matrix: number[] = checkValidIndexes(index);
+            // console.log(valid_matrix)
+            let alive: number = 0;
+            let dead: number = 0;
+            valid_matrix.forEach((valid_val, valid_index) => {
+                // console.log(index, valid_val,"\n")
+                if(index != valid_val){
+                    if (matrix[valid_val] === 1) {
+                        alive++;
+                    } else {
+                        dead++;
+                    }
+                }
+            });
+            console.log("alive", alive);
+            console.log("dead", dead);
         });
     }
 
@@ -71,34 +80,34 @@ export default function Home() {
         }
 
         if (isLeftEdgeMatrix(matrix_index) == true) {
-            valid_indexes.push(matrix_index - 1 - xMatrix);
-            valid_indexes.push(matrix_index - 1);
-            valid_indexes.push(matrix_index - 1 + xMatrix);
+            remove_indexes.push(matrix_index - 1 - xMatrix);
+            remove_indexes.push(matrix_index - 1);
+            remove_indexes.push(matrix_index - 1 + xMatrix);
         }
 
         if (isTopEdgeMatrix(matrix_index) == true) {
-            valid_indexes.push(matrix_index - 1 - xMatrix);
-            valid_indexes.push(matrix_index - xMatrix);
-            valid_indexes.push(matrix_index + 1 - xMatrix);
+            remove_indexes.push(matrix_index - 1 - xMatrix);
+            remove_indexes.push(matrix_index - xMatrix);
+            remove_indexes.push(matrix_index + 1 - xMatrix);
         }
 
-        if (isLeftEdgeMatrix(matrix_index) == true) {
-            valid_indexes.push(matrix_index + 1 - xMatrix);
-            valid_indexes.push(matrix_index + 1);
-            valid_indexes.push(matrix_index + 1 + xMatrix);
+        if (isRightEdgeMatrix(matrix_index) == true) {
+            remove_indexes.push(matrix_index + 1 - xMatrix);
+            remove_indexes.push(matrix_index + 1);
+            remove_indexes.push(matrix_index + 1 + xMatrix);
         }
 
         if (isBottomEdgeMatrix(matrix_index) == true) {
-            valid_indexes.push(matrix_index - 1 + xMatrix);
-            valid_indexes.push(matrix_index - xMatrix);
-            valid_indexes.push(matrix_index + 1 + xMatrix);
+            remove_indexes.push(matrix_index - 1 + xMatrix);
+            remove_indexes.push(matrix_index - xMatrix);
+            remove_indexes.push(matrix_index + 1 + xMatrix);
         }
-
-        let final_index = valid_indexes.filter(
+        
+        let final_indexes = valid_indexes.filter(
             (item) => !remove_indexes.includes(item) && item >= 0 && item != matrix_index
         );
-        final_index = final_index.filter((item, index) => final_index.indexOf(item) === index);
-        return final_index;
+        final_indexes = final_indexes.filter((item, index) => final_indexes.indexOf(item) === index);
+        return final_indexes;
     }
 
     function isLeftEdgeMatrix(matrix_index: number) {
@@ -167,7 +176,9 @@ export default function Home() {
                 <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }} onClick={handleXYChange}>
                     Change Matrix Size
                 </button>
-                <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}>Generate Next</button>
+                <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }} onClick={generateNext}>
+                    Generate Next
+                </button>
                 <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}>Stop Generating</button>
             </div>
             <div
