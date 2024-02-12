@@ -191,7 +191,7 @@ export default function Home() {
 
     return (
         <>
-            <ToastContainer />
+            <ToastContainer position="top-center" autoClose={1500} />
             <div className='generations-container'>Generations : {generations}</div>
             <div className='control-container'>
                 <div className='flex-col'>
