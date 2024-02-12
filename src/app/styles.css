@@ -3,14 +3,57 @@
     /* gap: 1px; */
     height: 99vh;
     width: 99vw;
-  }
-  
-  .dead {
+}
+
+.dead {
     border: 1px solid black;
     background-color: black;
-  }
+}
 
-  .alive{
+.alive {
     border: 1px solid black;
     background-color: red;
-  }
+}
+
+.control-container {
+    display: flex;
+    position: absolute;
+    justify-self: center;
+    flex-direction: row;
+    padding: 1em;
+    height: 5em;
+    align-items: center;
+    border-radius: 0.5em;
+    border: 1px solid red;
+    z-index: 100;
+}
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.control-buttons {
+    height: 100%;
+    margin-left: 1em;
+    padding: 0.5em;
+}
+
+.generations-container {
+    display: flex;
+    position: absolute;
+    justify-self: center;
+    flex-direction: row;
+    padding: 1em;
+    height: 5em;
+    align-items: center;
+    border-radius: 0.5em;
+    border: 1px solid red;
+    z-index: 100;
+    top: 0;
+    right: 1.5em;
+}

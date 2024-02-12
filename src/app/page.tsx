@@ -17,8 +17,12 @@ export default function Home() {
     const xnumber = useRef<HTMLInputElement>(null);
     const ynumber = useRef<HTMLInputElement>(null);
     const [generations, setGenerations] = useState(0);
+    const [generationState, setGenerationState]= useState(0)
+    // 0 reset, 1 pause, 2 play 
 
     function createMatrix(x: number, y: number) {
+        setGenerationState(0)
+        setGenerations(0)
         setMatrix(new Array(x * y).fill(0));
     }
     // const handleUpdate = () => {
@@ -52,13 +56,13 @@ export default function Home() {
     }
 
     useEffect(() => {
-        while (generations > 0) {
+        while (generationState === 2) {
             const intervalId = setInterval(generateNext, 1000); // run every second
             return () => {
                 clearInterval(intervalId); // clear interval on component unmount
             };
         }
-    }, [generations]);
+    });
 
     function generateNext() {
         const buffer_matrix: number[] = matrix;
@@ -188,48 +192,37 @@ export default function Home() {
     return (
         <>
             <ToastContainer />
-            <div
-                style={{
-                    display: "flex",
-                    position: "absolute",
-                    justifySelf: "center",
-                    flexDirection: "row",
-                    padding: "1em",
-                    height: "5em",
-                    alignItems: "center",
-                    borderRadius: "0.5em",
-                    border: "1px solid red",
-                    zIndex: 100,
-                }}>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                    <div style={{ display: "flex", flexDirection: "row" }}>
+            <div className='generations-container'>Generations : {generations}</div>
+            <div className='control-container'>
+                <div className='flex-col'>
+                    <div className='flex-row'>
                         <div style={{ padding: "0.25em" }}>length</div>
                         <input type='number' ref={xnumber}></input>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "row" }}>
+                    <div className='flex-row'>
                         <div style={{ padding: "0.25em" }}>height</div>
                         <input type='number' ref={ynumber}></input>
                     </div>
                 </div>
-                <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }} onClick={handleXYChange}>
+                <button className='control-buttons' onClick={handleXYChange}>
                     Change Matrix Size
                 </button>
                 <button
-                    style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}
+                    className='control-buttons'
                     onClick={() => {
-                        setGenerations(1);
+                        setGenerationState(2);
                     }}>
                     Generate Next
                 </button>
                 <button
-                    style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}
+                    className='control-buttons'
                     onClick={() => {
-                        setGenerations(0);
+                        setGenerationState(1);
                     }}>
                     Stop Generating
                 </button>
                 <button
-                    style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}
+                    className='control-buttons'
                     onClick={() => {
                         createMatrix(xMatrix, yMatrix);
                     }}>
