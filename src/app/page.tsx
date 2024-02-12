@@ -11,15 +11,19 @@ export default function Home() {
     const [xMatrix, setxMatrix] = useState<number>(5);
     const [yMatrix, setyMatrix] = useState<number>(5);
     const [matrix, setMatrix] = useState<number[]>([]); // Initialize a 5x5 matrix with zeros
-    const [bufferMatrix, setBufferMatrix] = useState<number[]>([]); // Initialize a 5x5 matrix with zeros
+    // const [bufferMatrix, setBufferMatrix] = useState<number[]>([]);
     const x = 5; // replace with your desired number of rows
     const y = 5; // replace with your desired number of columns
     const xnumber = useRef<HTMLInputElement>(null);
     const ynumber = useRef<HTMLInputElement>(null);
+    const [, forceUpdate] = useState(0);
 
     function createMatrix(x: number, y: number) {
         setMatrix(new Array(x * y).fill(0));
     }
+    const handleUpdate = () => {
+        forceUpdate(n => n + 1); // increment state to force render
+      };
 
     function handleXYChange() {
         // check if value is divisible by 2
@@ -48,16 +52,17 @@ export default function Home() {
     }
 
     function generateNext() {
-        const buffer_matrix: number[] = [];
+        const buffer_matrix: number[] = matrix;
         const edge_matrix: number[] = [];
         matrix.forEach((val, index) => {
+            console.log(index)
             const valid_matrix: number[] = checkValidIndexes(index);
             // console.log(valid_matrix)
             let alive: number = 0;
             let dead: number = 0;
             valid_matrix.forEach((valid_val, valid_index) => {
                 // console.log(index, valid_val,"\n")
-                if(index != valid_val){
+                if (index != valid_val) {
                     if (matrix[valid_val] === 1) {
                         alive++;
                     } else {
@@ -65,9 +70,34 @@ export default function Home() {
                     }
                 }
             });
-            console.log("alive", alive);
-            console.log("dead", dead);
+            // console.log("alive", alive);
+            // console.log("dead", dead);
+
+            // actual game of life rules below
+            if (matrix[index] === 1) {
+                console.log("cell is alive")
+                if (alive < 2) {
+                    // underpopulation
+                    buffer_matrix[index] = 0;
+                }
+                if (alive === 2 || alive === 3) {
+                    // lives on
+                    buffer_matrix[index] = 1;
+                }
+                if (alive > 3) {
+                    // overpopulation
+                    buffer_matrix[index] = 0;
+                }
+            } else if (matrix[index] === 0) {
+                if (alive === 3) {
+                    // comes alive by reproduction
+                    buffer_matrix[index] = 1;
+                }
+            }
         });
+        setMatrix(buffer_matrix)
+        console.log("done")
+        handleUpdate()
     }
 
     function checkValidIndexes(matrix_index: number): number[] {
@@ -102,7 +132,7 @@ export default function Home() {
             remove_indexes.push(matrix_index - xMatrix);
             remove_indexes.push(matrix_index + 1 + xMatrix);
         }
-        
+
         let final_indexes = valid_indexes.filter(
             (item) => !remove_indexes.includes(item) && item >= 0 && item != matrix_index
         );
