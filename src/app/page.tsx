@@ -16,14 +16,14 @@ export default function Home() {
     const y = 5; // replace with your desired number of columns
     const xnumber = useRef<HTMLInputElement>(null);
     const ynumber = useRef<HTMLInputElement>(null);
-    const [, forceUpdate] = useState(0);
+    const [generations, setGenerations] = useState(0);
 
     function createMatrix(x: number, y: number) {
         setMatrix(new Array(x * y).fill(0));
     }
-    const handleUpdate = () => {
-        forceUpdate(n => n + 1); // increment state to force render
-      };
+    // const handleUpdate = () => {
+    //     forceUpdate(n => n + 1); // increment state to force render
+    //   };
 
     function handleXYChange() {
         // check if value is divisible by 2
@@ -51,11 +51,19 @@ export default function Home() {
         // console.log(checkValidIndexes(matrix_index));
     }
 
+    useEffect(() => {
+        while (generations > 0) {
+            const intervalId = setInterval(generateNext, 1000); // run every second
+            return () => {
+                clearInterval(intervalId); // clear interval on component unmount
+            };
+        }
+    }, [generations]);
+
     function generateNext() {
         const buffer_matrix: number[] = matrix;
-        const edge_matrix: number[] = [];
         matrix.forEach((val, index) => {
-            console.log(index)
+            console.log(index);
             const valid_matrix: number[] = checkValidIndexes(index);
             // console.log(valid_matrix)
             let alive: number = 0;
@@ -75,7 +83,7 @@ export default function Home() {
 
             // actual game of life rules below
             if (matrix[index] === 1) {
-                console.log("cell is alive")
+                console.log("cell is alive");
                 if (alive < 2) {
                     // underpopulation
                     buffer_matrix[index] = 0;
@@ -95,9 +103,9 @@ export default function Home() {
                 }
             }
         });
-        setMatrix(buffer_matrix)
-        console.log("done")
-        handleUpdate()
+        setMatrix(buffer_matrix);
+        console.log("done");
+        setGenerations(generations + 1);
     }
 
     function checkValidIndexes(matrix_index: number): number[] {
@@ -206,10 +214,27 @@ export default function Home() {
                 <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }} onClick={handleXYChange}>
                     Change Matrix Size
                 </button>
-                <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }} onClick={generateNext}>
+                <button
+                    style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}
+                    onClick={() => {
+                        setGenerations(1);
+                    }}>
                     Generate Next
                 </button>
-                <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}>Stop Generating</button>
+                <button
+                    style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}
+                    onClick={() => {
+                        setGenerations(0);
+                    }}>
+                    Stop Generating
+                </button>
+                <button
+                    style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}
+                    onClick={() => {
+                        createMatrix(xMatrix, yMatrix);
+                    }}>
+                    Reset Matrix
+                </button>
             </div>
             <div
                 className='grid-container'
