@@ -6,12 +6,12 @@
 }
 
 .dead {
-    border: 1px solid thin grey;
+    border: 1px solid grey;
     background-color: black;
 }
 
 .alive {
-    border: 1px solid thin grey;
+    border: 1px solid grey;
     background-color: red;
 }
 
