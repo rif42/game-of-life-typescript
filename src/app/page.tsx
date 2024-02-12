@@ -8,28 +8,17 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    const [windowHeight, setWindowHeight] = useState(window.innerHeight);
     const [xMatrix, setxMatrix] = useState(5);
     const [yMatrix, setyMatrix] = useState(5);
-    const [matrix, setMatrix] = useState<number[][]>([]); // Initialize a 5x5 matrix with zeros
-    const [bufferMatrix, setBufferMatrix] = useState<number[][]>([]); // Initialize a 5x5 matrix with zeros
+    const [matrix, setMatrix] = useState<number[]>([]); // Initialize a 5x5 matrix with zeros
+    const [bufferMatrix, setBufferMatrix] = useState<number[]>([]); // Initialize a 5x5 matrix with zeros
     const x = 5; // replace with your desired number of rows
     const y = 5; // replace with your desired number of columns
     const xnumber = useRef<HTMLInputElement>(null);
     const ynumber = useRef<HTMLInputElement>(null);
 
     function createMatrix(x: number, y: number) {
-        const matrix: number[][] = [];
-        for (let i = 0; i < x; i++) {
-            matrix[i] = new Array(y).fill(0); // Initialize each row with zeros
-        }
-        setMatrix(matrix);
-    }
-
-    function handleResize() {
-        setWindowWidth(window.innerWidth);
-        setWindowHeight(window.innerHeight);
+        setMatrix(new Array(x * y).fill(0));
     }
 
     function handleXYChange() {
@@ -48,10 +37,14 @@ export default function Home() {
         createMatrix(xValue, yValue);
     }
 
-    useEffect(() => {
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    function handleMutate(index: number) {
+        const newMatrix = [...matrix];
+        if (newMatrix[index] === 1) newMatrix[index] = 0;
+        else {
+            newMatrix[index] = 1;
+        }
+        setMatrix(newMatrix);
+    }
 
     useEffect(() => {
         console.log(`xMatrix: ${xMatrix}, yMatrix: ${yMatrix}`);
@@ -84,19 +77,25 @@ export default function Home() {
                         <input type='number' ref={ynumber}></input>
                     </div>
                 </div>
-                <button style={{ height: "100%", margin: "1em", padding: "0.5em" }} onClick={handleXYChange}>
-                    Generate Next
+                <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }} onClick={handleXYChange}>
+                    Change Matrix Size
                 </button>
-                <button style={{ height: "100%", padding: "0.5em" }}>Stop Generating</button>
+                <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}>Generate Next</button>
+                <button style={{ height: "100%", marginLeft: "1em", padding: "0.5em" }}>Stop Generating</button>
             </div>
             <div
                 className='grid-container'
-                style={{ gridTemplateColumns: `repeat(${xMatrix}, 1fr)`, gridTemplateRows: `repeat(${yMatrix}, 1fr)` }}>
-                {Array.from({ length: xMatrix * yMatrix }).map((_, index) => (
-                    <div key={index} className='grid-item' onClick={()=>console.log(index+1)}>
-                        Item {index + 1}
-                    </div>
-                ))}
+                style={{
+                    gridTemplateColumns: `repeat(${xMatrix}, minmax(1px, 1fr))`,
+                    gridTemplateRows: `repeat(${yMatrix}, minmax(1px, 1fr))`,
+                }}>
+                {matrix.map((value, index) =>
+                    value === 1 ? (
+                        <div key={index} className='alive' onClick={() => handleMutate(index)}></div>
+                    ) : (
+                        <div key={index} className='dead' onClick={() => handleMutate(index)}></div>
+                    )
+                )}
             </div>
         </>
     );
